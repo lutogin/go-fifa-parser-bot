@@ -1,0 +1,35 @@
+version: "3.9"
+
+services:
+  go-fifa-parser-bot:
+    container_name: go-fifa-parser-bot
+    build:
+      context: codebase/go-fifa-parser-bot
+      dockerfile: Dockerfile_dev
+    restart: "no"
+    ports:
+      - "8181:8080"
+      - "2345:2345"
+    environment:
+      GOTRACEBACK: all # Flag for debug
+    volumes:
+      - ./codebase/go-fifa-parser-bot:/app
+    env_file:
+      - codebase/go-fifa-parser-bot/.env.loc
+    depends_on:
+      - go-fifa-parser-mongodb
+
+  go-fifa-parser-mongodb:
+    image: mongo:4-focal
+    container_name: go-fifa-parser-bot-mongodb
+    restart: "no"
+    ports:
+      - '27017:27017'
+    environment:
+      MONGO_INITDB_DATABASE: go-fifa-parser-bot
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: Password1
+      MONGO_USERNAME: user
+      MONGO_PASSWORD: password1
+    volumes:
+      - './init-mongodb.sh:/docker-entrypoint-initdb.d/mongo-init.sh:ro'
